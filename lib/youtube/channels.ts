@@ -27,7 +27,7 @@ export async function getChannelInfo(channelId: string): Promise<ChannelInfo | n
       id: channel.id!,
       title: channel.snippet?.title || '',
       description: channel.snippet?.description || '',
-      customUrl: channel.snippet?.customUrl,
+      customUrl: channel.snippet?.customUrl || undefined,
       thumbnailUrl: channel.snippet?.thumbnails?.high?.url || channel.snippet?.thumbnails?.default?.url,
     }
   } catch (error) {
