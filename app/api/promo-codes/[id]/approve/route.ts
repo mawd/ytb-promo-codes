@@ -8,7 +8,7 @@ import { requireAdmin } from '@/lib/auth/admin'
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const authError = requireAdmin(request)
   if (authError) {
@@ -16,8 +16,9 @@ export async function POST(
   }
 
   try {
+    const { id } = await params
     const promoCode = await prisma.promoCode.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         status: 'APPROVED',
         approvedAt: new Date(),

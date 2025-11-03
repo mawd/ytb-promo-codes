@@ -10,7 +10,7 @@ import { detectPromoCodes } from '@/lib/promo'
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const authError = requireAdmin(request)
   if (authError) {
@@ -18,9 +18,10 @@ export async function POST(
   }
 
   try {
+    const { id } = await params
     // Récupérer la chaîne
     const channel = await prisma.channel.findUnique({
-      where: { id: params.id },
+      where: { id },
     })
 
     if (!channel) {

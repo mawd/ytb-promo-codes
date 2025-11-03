@@ -8,11 +8,12 @@ import { requireAdmin } from '@/lib/auth/admin'
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const channel = await prisma.channel.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         category: true,
         _count: {
@@ -47,7 +48,7 @@ export async function GET(
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const authError = requireAdmin(request)
   if (authError) {
@@ -55,6 +56,7 @@ export async function PATCH(
   }
 
   try {
+    const { id } = await params
     const body = await request.json()
     const { categoryId, isActive } = body
 
@@ -81,7 +83,7 @@ export async function PATCH(
     }
 
     const channel = await prisma.channel.update({
-      where: { id: params.id },
+      where: { id },
       data,
       include: {
         category: true,
@@ -112,7 +114,7 @@ export async function PATCH(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const authError = requireAdmin(request)
   if (authError) {
@@ -120,8 +122,9 @@ export async function DELETE(
   }
 
   try {
+    const { id } = await params
     await prisma.channel.delete({
-      where: { id: params.id },
+      where: { id },
     })
 
     return NextResponse.json({ success: true })

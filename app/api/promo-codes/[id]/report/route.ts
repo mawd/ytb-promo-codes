@@ -7,9 +7,10 @@ import { prisma } from '@/lib/prisma'
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const body = await request.json()
     const { reason, comment } = body
 
@@ -22,7 +23,7 @@ export async function POST(
 
     // Vérifier que le code existe
     const promoCode = await prisma.promoCode.findUnique({
-      where: { id: params.id },
+      where: { id },
     })
 
     if (!promoCode) {
@@ -40,7 +41,7 @@ export async function POST(
     // Créer le signalement
     await prisma.userReport.create({
       data: {
-        promoCodeId: params.id,
+        promoCodeId: id,
         reason,
         comment: comment || null,
         ipAddress,
@@ -49,13 +50,13 @@ export async function POST(
 
     // Compter le nombre total de signalements pour ce code
     const reportCount = await prisma.userReport.count({
-      where: { promoCodeId: params.id },
+      where: { promoCodeId: id },
     })
 
     // Si >= 3 signalements, marquer le code comme inactif automatiquement
     if (reportCount >= 3) {
       await prisma.promoCode.update({
-        where: { id: params.id },
+        where: { id },
         data: {
           isActive: false,
           status: reason === 'EXPIRED' ? 'EXPIRED' : promoCode.status,

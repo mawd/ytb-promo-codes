@@ -8,11 +8,12 @@ import { requireAdmin } from '@/lib/auth/admin'
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const promoCode = await prisma.promoCode.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         video: true,
         channel: {
@@ -51,7 +52,7 @@ export async function GET(
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const authError = requireAdmin(request)
   if (authError) {
@@ -59,6 +60,7 @@ export async function PATCH(
   }
 
   try {
+    const { id } = await params
     const body = await request.json()
     const { brand, product, discount, description, expiresAt, isActive } = body
 
@@ -72,7 +74,7 @@ export async function PATCH(
     if (isActive !== undefined) data.isActive = isActive
 
     const promoCode = await prisma.promoCode.update({
-      where: { id: params.id },
+      where: { id },
       data,
       include: {
         video: true,
@@ -104,7 +106,7 @@ export async function PATCH(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const authError = requireAdmin(request)
   if (authError) {
@@ -112,8 +114,9 @@ export async function DELETE(
   }
 
   try {
+    const { id } = await params
     await prisma.promoCode.delete({
-      where: { id: params.id },
+      where: { id },
     })
 
     return NextResponse.json({ success: true })
