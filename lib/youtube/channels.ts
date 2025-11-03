@@ -28,7 +28,7 @@ export async function getChannelInfo(channelId: string): Promise<ChannelInfo | n
       title: channel.snippet?.title || '',
       description: channel.snippet?.description || '',
       customUrl: channel.snippet?.customUrl || undefined,
-      thumbnailUrl: channel.snippet?.thumbnails?.high?.url || channel.snippet?.thumbnails?.default?.url,
+      thumbnailUrl: channel.snippet?.thumbnails?.high?.url || channel.snippet?.thumbnails?.default?.url || undefined,
     }
   } catch (error) {
     console.error('Error fetching channel info:', error)
@@ -67,7 +67,7 @@ export async function getRecentVideos(
         id: item.id!.videoId!,
         title: item.snippet!.title || '',
         publishedAt: item.snippet!.publishedAt || new Date().toISOString(),
-        thumbnailUrl: item.snippet!.thumbnails?.high?.url || item.snippet!.thumbnails?.default?.url,
+        thumbnailUrl: item.snippet!.thumbnails?.high?.url || item.snippet!.thumbnails?.default?.url || undefined,
       }))
   } catch (error) {
     console.error('Error fetching recent videos:', error)

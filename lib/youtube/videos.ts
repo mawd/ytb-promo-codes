@@ -32,7 +32,7 @@ export async function getVideoDetails(videoId: string): Promise<VideoDetails | n
       publishedAt: video.snippet.publishedAt || new Date().toISOString(),
       channelId: video.snippet.channelId || '',
       channelTitle: video.snippet.channelTitle || '',
-      thumbnailUrl: video.snippet.thumbnails?.high?.url || video.snippet.thumbnails?.default?.url,
+      thumbnailUrl: video.snippet.thumbnails?.high?.url || video.snippet.thumbnails?.default?.url || undefined,
     }
   } catch (error) {
     console.error(`Error fetching video details for ${videoId}:`, error)
@@ -66,7 +66,7 @@ export async function getVideosByIds(videoIds: string[]): Promise<VideoDetails[]
           publishedAt: video.snippet!.publishedAt || new Date().toISOString(),
           channelId: video.snippet!.channelId || '',
           channelTitle: video.snippet!.channelTitle || '',
-          thumbnailUrl: video.snippet!.thumbnails?.high?.url || video.snippet!.thumbnails?.default?.url,
+          thumbnailUrl: video.snippet!.thumbnails?.high?.url || video.snippet!.thumbnails?.default?.url || undefined,
         }))
 
       allVideos.push(...mappedVideos)
