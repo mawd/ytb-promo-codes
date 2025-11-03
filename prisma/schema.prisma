@@ -1,0 +1,127 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Catégories de chaînes YouTube (Tech, Gaming, Beauté, etc.)
+model Category {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  channels    Channel[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("categories")
+}
+
+// Chaînes YouTube surveillées
+model Channel {
+  id             String      @id @default(uuid())
+  youtubeId      String      @unique
+  name           String
+  customUrl      String?
+  description    String?     @db.Text
+  thumbnailUrl   String?
+  categoryId     String
+  category       Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  isActive       Boolean     @default(true)
+  lastScrapedAt  DateTime?
+  videos         Video[]
+  promoCodes     PromoCode[]
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  @@index([categoryId])
+  @@index([isActive])
+  @@map("channels")
+}
+
+// Vidéos YouTube analysées
+model Video {
+  id             String      @id @default(uuid())
+  youtubeId      String      @unique
+  title          String
+  description    String      @db.Text
+  publishedAt    DateTime
+  channelId      String
+  channel        Channel     @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  thumbnailUrl   String?
+  hasBeenScraped Boolean     @default(false)
+  promoCodes     PromoCode[]
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  @@index([channelId])
+  @@index([hasBeenScraped])
+  @@index([publishedAt])
+  @@map("videos")
+}
+
+// Codes promotionnels détectés
+model PromoCode {
+  id            String       @id @default(uuid())
+  code          String
+  brand         String?
+  product       String?
+  discount      String?
+  description   String?      @db.Text
+  extractedText String       @db.Text
+  videoId       String
+  video         Video        @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  channelId     String
+  channel       Channel      @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  status        PromoStatus  @default(PENDING)
+  isActive      Boolean      @default(true)
+  detectedAt    DateTime     @default(now())
+  approvedAt    DateTime?
+  expiresAt     DateTime?
+  reports       UserReport[]
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@index([status])
+  @@index([isActive])
+  @@index([brand])
+  @@index([product])
+  @@index([videoId])
+  @@index([channelId])
+  @@map("promo_codes")
+}
+
+// Signalements utilisateurs pour codes expirés/invalides
+model UserReport {
+  id          String       @id @default(uuid())
+  promoCodeId String
+  promoCode   PromoCode    @relation(fields: [promoCodeId], references: [id], onDelete: Cascade)
+  reason      ReportReason
+  comment     String?      @db.Text
+  ipAddress   String?
+  createdAt   DateTime     @default(now())
+
+  @@index([promoCodeId])
+  @@map("user_reports")
+}
+
+// Enum pour le statut des codes promo
+enum PromoStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
+// Enum pour les raisons de signalement
+enum ReportReason {
+  EXPIRED
+  INVALID
+  OTHER
+}
