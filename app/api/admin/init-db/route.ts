@@ -29,6 +29,9 @@ export async function POST(request: NextRequest) {
     `
 
     const tablesExist = tableCheck[0]?.exists
+    console.log('Tables exist check:', tablesExist)
+
+    const executionLog = []
 
     if (!tablesExist) {
       // Tables don't exist, create them
@@ -41,11 +44,26 @@ export async function POST(request: NextRequest) {
         .map(s => s.trim())
         .filter(s => s.length > 0 && !s.startsWith('--'))
 
-      for (const statement of statements) {
+      console.log(`Executing ${statements.length} SQL statements...`)
+
+      for (let i = 0; i < statements.length; i++) {
+        const statement = statements[i]
         if (statement) {
-          await prisma.$executeRawUnsafe(statement)
+          try {
+            await prisma.$executeRawUnsafe(statement)
+            executionLog.push({ index: i, status: 'success', preview: statement.substring(0, 50) })
+          } catch (err) {
+            console.error(`Error executing statement ${i}:`, err)
+            executionLog.push({
+              index: i,
+              status: 'error',
+              preview: statement.substring(0, 50),
+              error: err instanceof Error ? err.message : String(err)
+            })
+          }
         }
       }
+      console.log('Schema creation completed')
     }
 
     // Seed initial categories
@@ -77,6 +95,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: 'Database initialized successfully',
+      tablesExisted: tablesExist,
+      executionLog: executionLog.length > 0 ? executionLog : undefined,
       results,
     })
   } catch (error) {
