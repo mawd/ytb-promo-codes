@@ -31,11 +31,23 @@ export async function POST(request: NextRequest) {
 
     const schemaSql = fs.readFileSync(schemaPath, 'utf8')
     console.log('Schema loaded, length:', schemaSql.length)
+    console.log('First 200 chars:', schemaSql.substring(0, 200))
 
     const statements = schemaSql
       .split(';')
       .map(s => s.trim())
       .filter(s => s.length > 0 && !s.startsWith('--'))
+
+    console.log(`Split into ${schemaSql.split(';').length} parts, filtered to ${statements.length} statements`)
+
+    if (statements.length === 0) {
+      return NextResponse.json({
+        error: 'No SQL statements found',
+        schemaLength: schemaSql.length,
+        preview: schemaSql.substring(0, 500),
+        splitCount: schemaSql.split(';').length
+      }, { status: 500 })
+    }
 
     console.log(`Executing ${statements.length} statements...`)
 
