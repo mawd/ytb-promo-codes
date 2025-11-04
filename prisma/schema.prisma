@@ -80,7 +80,6 @@ model PromoCode {
   channel       Channel      @relation(fields: [channelId], references: [id], onDelete: Cascade)
   status        PromoStatus  @default(PENDING)
   isActive      Boolean      @default(true)
-  detectedAt    DateTime     @default(now())
   approvedAt    DateTime?
   expiresAt     DateTime?
   reports       UserReport[]
@@ -90,9 +89,9 @@ model PromoCode {
   @@index([status])
   @@index([isActive])
   @@index([brand])
-  @@index([product])
-  @@index([videoId])
   @@index([channelId])
+  @@index([videoId])
+  @@index([expiresAt])
   @@map("promo_codes")
 }
 
