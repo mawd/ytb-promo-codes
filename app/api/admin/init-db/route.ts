@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/auth/admin'
 import { prisma } from '@/lib/prisma'
+import fs from 'fs'
+import path from 'path'
 
 /**
  * POST /api/admin/init-db
@@ -16,6 +18,19 @@ export async function POST(request: NextRequest) {
   try {
     // Test database connection
     await prisma.$connect()
+
+    // Check if tables already exist
+    try {
+      await prisma.category.findFirst()
+      // If we get here, tables exist
+    } catch (error) {
+      // Tables don't exist, create them
+      const schemaPath = path.join(process.cwd(), 'prisma', 'schema.sql')
+      const schemaSql = fs.readFileSync(schemaPath, 'utf8')
+
+      // Execute the SQL in transactions
+      await prisma.$executeRawUnsafe(schemaSql)
+    }
 
     // Seed initial categories
     const categories = [
