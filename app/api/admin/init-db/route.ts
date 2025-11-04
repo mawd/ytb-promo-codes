@@ -28,13 +28,17 @@ export async function POST(request: NextRequest) {
       ) as exists
     `
 
-    const tablesExist = Boolean(tableCheck[0]?.exists)
-    console.log('Tables exist check:', tablesExist, 'Type:', typeof tablesExist, 'Full result:', JSON.stringify(tableCheck))
+    const rawExists = tableCheck[0]?.exists
+    const tablesExist = Boolean(rawExists)
+    console.log('Tables exist check - raw:', rawExists, 'boolean:', tablesExist, 'Type:', typeof rawExists, 'Full result:', JSON.stringify(tableCheck))
 
     const executionLog = []
 
-    if (!tablesExist) {
+    // Always execute schema creation if tables don't exist
+    // Using === false to be explicit
+    if (rawExists === false) {
       // Tables don't exist, create them
+      console.log('Tables do not exist, creating schema...')
       const schemaPath = path.join(process.cwd(), 'prisma', 'schema.sql')
       const schemaSql = fs.readFileSync(schemaPath, 'utf8')
 
@@ -51,9 +55,10 @@ export async function POST(request: NextRequest) {
         if (statement) {
           try {
             await prisma.$executeRawUnsafe(statement)
+            console.log(`✓ Statement ${i} executed successfully`)
             executionLog.push({ index: i, status: 'success', preview: statement.substring(0, 50) })
           } catch (err) {
-            console.error(`Error executing statement ${i}:`, err)
+            console.error(`✗ Error executing statement ${i}:`, err)
             executionLog.push({
               index: i,
               status: 'error',
@@ -64,6 +69,8 @@ export async function POST(request: NextRequest) {
         }
       }
       console.log('Schema creation completed')
+    } else {
+      console.log('Tables already exist, skipping schema creation')
     }
 
     // Seed initial categories
