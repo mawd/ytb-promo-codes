@@ -12,7 +12,8 @@
       "Bash(git push:*)",
       "Bash(curl:*)",
       "Bash(DATABASE_URL=\"postgresql://ytb_promo_codes_db_user:l1rGaFkGJD2eJW5qgBtFS9lKxC8DR55e@dpg-d44jh7umcj7s73anldrg-a.frankfurt-postgres.render.com/ytb_promo_codes_db\" npx prisma migrate:*)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(https://ytb-promo-codes.onrender.com/api/admin/init-db)"
     ],
     "deny": [],
     "ask": []
