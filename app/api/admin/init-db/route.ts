@@ -28,8 +28,17 @@ export async function POST(request: NextRequest) {
       const schemaPath = path.join(process.cwd(), 'prisma', 'schema.sql')
       const schemaSql = fs.readFileSync(schemaPath, 'utf8')
 
-      // Execute the SQL in transactions
-      await prisma.$executeRawUnsafe(schemaSql)
+      // Split SQL into individual statements and execute each one
+      const statements = schemaSql
+        .split(';')
+        .map(s => s.trim())
+        .filter(s => s.length > 0 && !s.startsWith('--'))
+
+      for (const statement of statements) {
+        if (statement) {
+          await prisma.$executeRawUnsafe(statement)
+        }
+      }
     }
 
     // Seed initial categories
