@@ -10,7 +10,9 @@
       "Bash(git commit:*)",
       "Bash(git remote add:*)",
       "Bash(git push:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(DATABASE_URL=\"postgresql://ytb_promo_codes_db_user:l1rGaFkGJD2eJW5qgBtFS9lKxC8DR55e@dpg-d44jh7umcj7s73anldrg-a.frankfurt-postgres.render.com/ytb_promo_codes_db\" npx prisma migrate:*)",
+      "Bash(chmod:*)"
     ],
     "deny": [],
     "ask": []
