@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: ytb-promo-codes
+    runtime: node
+    region: frankfurt
+    plan: starter
+    branch: main
+    buildCommand: npm install && npx prisma generate && npx prisma migrate deploy && npm run build
+    startCommand: npm start
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: YOUTUBE_API_KEY
+        sync: false
+      - key: ADMIN_SECRET_KEY
+        sync: false
+      - key: NEXT_PUBLIC_APP_URL
+        value: https://ytb-promo-codes.onrender.com
+
+databases:
+  - name: ytb-promo-codes-db
+    databaseName: ytb_promo_codes_db
+    region: frankfurt
+    plan: free
