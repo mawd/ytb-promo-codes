@@ -29,7 +29,6 @@ model Channel {
   youtubeId      String      @unique
   name           String
   customUrl      String?
-  description    String?     @db.Text
   thumbnailUrl   String?
   categoryId     String
   category       Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)

@@ -98,7 +98,6 @@ export async function POST(request: NextRequest) {
       data: {
         youtubeId: channelInfo.id,
         name: channelInfo.title,
-        description: channelInfo.description,
         customUrl: channelInfo.customUrl,
         thumbnailUrl: channelInfo.thumbnailUrl,
         categoryId,
