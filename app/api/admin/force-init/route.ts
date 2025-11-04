@@ -33,10 +33,16 @@ export async function POST(request: NextRequest) {
     console.log('Schema loaded, length:', schemaSql.length)
     console.log('First 200 chars:', schemaSql.substring(0, 200))
 
-    const statements = schemaSql
+    // Remove comment lines, then split by semicolon
+    const cleanedSql = schemaSql
+      .split('\n')
+      .filter(line => !line.trim().startsWith('--'))
+      .join('\n')
+
+    const statements = cleanedSql
       .split(';')
       .map(s => s.trim())
-      .filter(s => s.length > 0 && !s.startsWith('--'))
+      .filter(s => s.length > 0)
 
     console.log(`Split into ${schemaSql.split(';').length} parts, filtered to ${statements.length} statements`)
 
