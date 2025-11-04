@@ -19,11 +19,18 @@ export async function POST(request: NextRequest) {
     // Test database connection
     await prisma.$connect()
 
-    // Check if tables already exist
-    try {
-      await prisma.category.findFirst()
-      // If we get here, tables exist
-    } catch (error) {
+    // Check if tables already exist using raw SQL
+    const tableCheck = await prisma.$queryRaw<Array<{ exists: boolean }>>`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables
+        WHERE table_schema = 'public'
+        AND table_name = 'categories'
+      ) as exists
+    `
+
+    const tablesExist = tableCheck[0]?.exists
+
+    if (!tablesExist) {
       // Tables don't exist, create them
       const schemaPath = path.join(process.cwd(), 'prisma', 'schema.sql')
       const schemaSql = fs.readFileSync(schemaPath, 'utf8')
