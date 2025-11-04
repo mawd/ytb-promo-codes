@@ -15,7 +15,8 @@
       "Bash(chmod:*)",
       "Bash(https://ytb-promo-codes.onrender.com/api/admin/init-db)",
       "Bash(https://ytb-promo-codes.onrender.com/api/admin/db-status)",
-      "Bash(https://ytb-promo-codes.onrender.com/api/admin/force-init)"
+      "Bash(https://ytb-promo-codes.onrender.com/api/admin/force-init)",
+      "Bash(python3:*)"
     ],
     "deny": [],
     "ask": []

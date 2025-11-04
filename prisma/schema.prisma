@@ -31,7 +31,7 @@ model Channel {
   customUrl      String?
   thumbnailUrl   String?
   categoryId     String
-  category       Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  category       Category    @relation(fields: [categoryId], references: [id], onDelete: Restrict)
   isActive       Boolean     @default(true)
   lastScrapedAt  DateTime?
   videos         Video[]
