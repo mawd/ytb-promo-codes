@@ -29,11 +29,12 @@ export async function POST(request: NextRequest) {
     `
 
     const tablesExist = tableCheck[0]?.exists
-    console.log('Tables exist check:', tablesExist)
+    console.log('Tables exist check:', tablesExist, 'Type:', typeof tablesExist, 'Full result:', JSON.stringify(tableCheck))
 
     const executionLog = []
 
-    if (!tablesExist) {
+    // Force recreation for debugging - will be conditional later
+    if (tablesExist === false || !tablesExist) {
       // Tables don't exist, create them
       const schemaPath = path.join(process.cwd(), 'prisma', 'schema.sql')
       const schemaSql = fs.readFileSync(schemaPath, 'utf8')
