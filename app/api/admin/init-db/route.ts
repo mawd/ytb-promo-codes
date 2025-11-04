@@ -40,7 +40,21 @@ export async function POST(request: NextRequest) {
       // Tables don't exist, create them
       console.log('Tables do not exist, creating schema...')
       const schemaPath = path.join(process.cwd(), 'prisma', 'schema.sql')
+      console.log('Schema path:', schemaPath)
+      console.log('File exists:', fs.existsSync(schemaPath))
+
+      if (!fs.existsSync(schemaPath)) {
+        return NextResponse.json({
+          error: 'Schema file not found',
+          schemaPath,
+          cwd: process.cwd(),
+          prismaDir: fs.existsSync(path.join(process.cwd(), 'prisma')),
+          files: fs.readdirSync(path.join(process.cwd(), 'prisma'))
+        }, { status: 500 })
+      }
+
       const schemaSql = fs.readFileSync(schemaPath, 'utf8')
+      console.log('Schema SQL loaded, length:', schemaSql.length)
 
       // Split SQL into individual statements and execute each one
       const statements = schemaSql
