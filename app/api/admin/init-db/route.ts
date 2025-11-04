@@ -34,9 +34,10 @@ export async function POST(request: NextRequest) {
 
     const executionLog = []
 
-    // Always execute schema creation if tables don't exist
-    // Using === false to be explicit
-    if (rawExists === false) {
+    // FORCE EXECUTION FOR DEBUGGING - will check properly later
+    const forceCreate = true
+
+    if (forceCreate || rawExists === false) {
       // Tables don't exist, create them
       console.log('Tables do not exist, creating schema...')
       const schemaPath = path.join(process.cwd(), 'prisma', 'schema.sql')
